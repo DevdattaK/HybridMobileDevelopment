@@ -275,7 +275,7 @@ angular.module('conFusion.controllers', [])
                     }, 2000);
                 },
                 function (response){
-                    $scope.message("Error - Dishes empt");
+                    $scope.message("Error - Dishes empty");
                     $timeout(function(){
                         $ionicLoading.hide();
                     }, 2000);
@@ -304,4 +304,8 @@ angular.module('conFusion.controllers', [])
                 $scope.shouldShowDelete = false;
             };
 
-        }]);
+        }])
+
+
+        
+;

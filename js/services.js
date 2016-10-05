@@ -59,5 +59,6 @@ angular.module('conFusion.services', ['ngResource'])
             
             return favFac;
         }])
+         
 
 ;
