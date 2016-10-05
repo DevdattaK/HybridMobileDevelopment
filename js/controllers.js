@@ -68,7 +68,7 @@ angular.module('conFusion.controllers', [])
   
 })
 
-        .controller('MenuController', ['$scope', 'menuFactory', 'baseURL', function($scope, menuFactory, baseURL) {
+        .controller('MenuController', ['$scope', 'menuFactory', 'baseURL', 'favouriteFactory', '$ionicListDelegate', function($scope, menuFactory, baseURL, favouriteFactory, $ionicListDelegate) {
             
             $scope.baseURL = baseURL;
             $scope.tab = 1;
@@ -111,6 +111,11 @@ angular.module('conFusion.controllers', [])
             $scope.toggleDetails = function() {
                 $scope.showDetails = !$scope.showDetails;
             };
+            
+            $scope.addFavourite = function(dishid){
+                favouriteFactory.addToFavourite(dishid);
+                $ionicListDelegate.closeOptionButtons();
+            };
         }])
 
         .controller('ContactController', ['$scope', function($scope) {
@@ -145,13 +150,44 @@ angular.module('conFusion.controllers', [])
             };
         }])
 
-        .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory','baseURL', function($scope, $stateParams, menuFactory, baseURL) {
+        .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory','baseURL', '$ionicPopover', 'favouriteFactory', '$ionicModal', 'integerRangeFilter', function($scope, $stateParams, menuFactory, baseURL, $ionicPopover, favouriteFactory, $ionicModal, integerRangeFilter) {
             
             $scope.baseURL = baseURL;
             $scope.dish = {};
             $scope.showDish = false;
-            $scope.message="Loading ...";
+            $scope.message="Loading ...";            
+            $scope.mycomment = {rating:5, comment:"", author:""};
             
+            $ionicPopover.fromTemplateUrl('templates/dishDetailPopover.html',{
+                                         scope : $scope
+                                        }).then(function(popover){
+                                            $scope.popover = popover;
+                                        });
+            
+            
+            $ionicModal.fromTemplateUrl('templates/dishComment.html',{
+                                         scope : $scope
+                                        }).then(function(modal){
+                                            $scope.dishCommentModal = modal;
+                                        });
+            
+            
+            
+            $scope.submitComment = function(){ 
+                $scope.dish.comments.push($scope.mycomment);
+                menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
+                $scope.dishCommentModal.hide();
+            };
+            
+            $scope.showComment = function(){
+                $scope.popover.hide();
+                $scope.dishCommentModal.show();
+            };
+            
+            $scope.closeComment = function(){
+                $scope.dishCommentModal.hide();
+            };
+             
             $scope.dish = menuFactory.getDishes().get({id:parseInt($stateParams.id,10)})
             .$promise.then(
                             function(response){
@@ -163,7 +199,11 @@ angular.module('conFusion.controllers', [])
                             }
             );
 
-            
+            //popover -> add favourite 
+            $scope.addFavourite = function(){
+                favouriteFactory.addToFavourite($scope.dish.id);
+                $scope.popover.hide();
+            }
         }])
 
         .controller('DishCommentController', ['$scope', 'menuFactory', function($scope,menuFactory) {
@@ -176,7 +216,7 @@ angular.module('conFusion.controllers', [])
                 console.log($scope.mycomment);
                 
                 $scope.dish.comments.push($scope.mycomment);
-        menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
+                menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
                 
                 $scope.commentForm.$setPristine();
                 
@@ -212,4 +252,56 @@ angular.module('conFusion.controllers', [])
                     $scope.leaders = corporateFactory.query();
                     console.log($scope.leaders);
             
-                    }]);
+                    }])
+
+        .controller('FavouritesController', ['$scope', 'menuFactory','favouriteFactory', 'baseURL', '$ionicListDelegate', 'favouriteFilterFilter', '$ionicPopup', '$ionicLoading' , '$timeout' ,  function($scope, menuFactory, favouriteFactory, baseURL, $ionicListDelegate, favouriteFilterFilter, $ionicPopup, $ionicLoading , $timeout){
+            
+            $scope.baseURL = baseURL;
+            $scope.shouldShowDelete = false;
+            
+            
+            $ionicLoading.show({
+                template : '<ion-spinner></ion-spinner> Loading...'
+            });
+          
+                        
+            menuFactory.getDishes().query(
+                
+                function (response){
+                    
+                    $scope.dishes = response;
+                    $timeout(function(){
+                        $ionicLoading.hide();
+                    }, 2000);
+                },
+                function (response){
+                    $scope.message("Error - Dishes empt");
+                    $timeout(function(){
+                        $ionicLoading.hide();
+                    }, 2000);
+            });
+            
+            $scope.favourites = favouriteFactory.getFavourites();
+            
+            $scope.toggleDelete = function(){
+                $scope.shouldShowDelete = !$scope.shouldShowDelete;
+            };
+            
+            $scope.deleteFavourite = function(dishID){
+                var confirmPopup = $ionicPopup.confirm({
+                    title: "Confirm Deleted",
+                    template : "Are you sure you want to delete this item?"
+                });
+                
+                confirmPopup.then(function(res){
+                    if(res){
+                        favouriteFactory.deleteFromFavourites(dishID);
+                    }else{
+                        console.log('Cancel Delete');
+                    }
+                })                
+                
+                $scope.shouldShowDelete = false;
+            };
+
+        }]);

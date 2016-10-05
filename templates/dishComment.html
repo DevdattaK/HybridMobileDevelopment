@@ -1,0 +1,38 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">Dish Comment</h1>
+        <div class="buttons">
+          <button class="button button-clear button-stable" ng-click="closeComment()">Close</button>
+        </div>
+    </ion-header-bar>
+    <ion-content>
+        <form ng-submit="submitComment()">
+            <div class="list">
+                <label class="item item-input item-select">
+                    <span class="input-label">
+                        Rating
+                    </span>
+                    <select ng-model="mycomment.rating">
+                        <!-- integerRange is a filter. You can declare a static array below instead of custom filter -->
+                        <option ng-repeat="x in [] | integerRange : 5">{{x}}</option>
+                    </select>
+                </label>
+                <label class="item item-input item-text">
+                    <span class="input-label">
+                        Your Name
+                    </span>
+                    <input type="text" ng-model="mycomment.author">
+                </label>
+                <label class="item item-input item-text">
+                    <span class="input-label">
+                        Your Comment
+                    </span>
+                    <input type="text" ng-model="mycomment.comment">
+                </label>
+                <label class="item">
+                    <button class="button button-block button-positive" type="submit">Submit</button>
+                </label>
+            </div>
+        </form>
+    </ion-content>
+</ion-modal-view>
