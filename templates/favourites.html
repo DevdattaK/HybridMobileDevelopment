@@ -7,7 +7,7 @@
     <ion-content>
         <ion-list show-delete = "shouldShowDelete">
             <ion-item ng-repeat="dish in dishes | favouriteFilter : favourites" class="item-thumbnail-left"
-                      on-swipe-left="deleteFavourite({{dish.id}})">
+                      on-swipe-left="deleteFavourite({{dish.id}})">                
                 <img ng-src="{{baseURL + dish.image}}">
                 <h2>{{dish.name}}
                     <span style="font-size:75%">{{dish.price | currency}}</span>
