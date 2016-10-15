@@ -9,6 +9,11 @@ angular.module('conFusion', ['ionic', 'ngCordova' , 'conFusion.controllers', 'co
 .run(function($ionicPlatform, $ionicLoading, $rootScope, $cordovaSplashscreen, $timeout) {
   $ionicPlatform.ready(function() {
      
+      $timeout(function(){
+        $cordovaSplashscreen.show();
+      }, 3000).then(function(){
+          $cordovaSplashscreen.hide();
+      });
       
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -22,6 +27,7 @@ angular.module('conFusion', ['ionic', 'ngCordova' , 'conFusion.controllers', 'co
       StatusBar.styleDefault();
     }
       
+    
       
   });
     
